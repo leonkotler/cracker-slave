@@ -1,8 +1,5 @@
-package com.leon.cracker.crackerslave.master;
+package com.leon.cracker.crackerslave.models;
 
-import org.springframework.stereotype.Component;
-
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class SlaveInfo  {

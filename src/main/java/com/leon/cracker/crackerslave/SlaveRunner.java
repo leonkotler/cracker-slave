@@ -1,7 +1,8 @@
 package com.leon.cracker.crackerslave;
 
-import com.leon.cracker.crackerslave.master.MasterManagerService;
-import com.leon.cracker.crackerslave.master.SlaveInfo;
+import com.leon.cracker.crackerslave.services.IMasterManagerService;
+import com.leon.cracker.crackerslave.services.ISlaveMetaDataService;
+import com.leon.cracker.crackerslave.models.SlaveInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,17 @@ public class SlaveRunner implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(SlaveRunner.class);
 
-    private MasterManagerService masterManagerService;
+    private IMasterManagerService masterManagerService;
+    private ISlaveMetaDataService slaveMetaDataService;
 
     @Autowired
-    public void setMasterManagerService(MasterManagerService masterManagerService) {
+    public void setMasterManagerService(IMasterManagerService masterManagerService) {
         this.masterManagerService = masterManagerService;
+    }
+
+    @Autowired
+    public void setSlaveMetaDataService(ISlaveMetaDataService slaveMetaDataService) {
+        this.slaveMetaDataService = slaveMetaDataService;
     }
 
     @Value("${slave.name}")
@@ -42,7 +49,9 @@ public class SlaveRunner implements CommandLineRunner {
 
         logger.info("Slave [{}] initiated successfully by master at: {}", slaveName, hostAndPort);
 
-        masterManagerService.registerWithMaster(new SlaveInfo(slaveName, getLocalHost(), getPort()));
+        SlaveInfo slaveInfo = new SlaveInfo(slaveName, getLocalHost(), getPort());
+        masterManagerService.registerWithMaster(slaveInfo);
+        slaveMetaDataService.setSlaveInfo(slaveInfo);
     }
 
     private String getLocalHost() {

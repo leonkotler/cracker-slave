@@ -2,12 +2,12 @@ package com.leon.cracker.crackerslave.services;
 
 import com.leon.cracker.crackerslave.externalapi.IMasterApi;
 import com.leon.cracker.crackerslave.models.FoundPasswordRequest;
-import com.leon.cracker.crackerslave.models.HealthStatus;
+import com.leon.cracker.crackerslave.models.SlaveCrackingRequest;
+import com.leon.cracker.crackerslave.models.SlaveDoneRequest;
 import com.leon.cracker.crackerslave.models.SlaveInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -21,11 +21,17 @@ public class MasterManager implements IMasterManagerService {
     private String host;
     private int port;
     private IMasterApi masterApi;
+    private ISlaveMetaDataService slaveMetaDataService;
     private static final Logger logger = LoggerFactory.getLogger(MasterManager.class);
 
     @Autowired
     public void setMasterApi(IMasterApi masterApi) {
         this.masterApi = masterApi;
+    }
+
+    @Autowired
+    public void setSlaveMetaDataService(ISlaveMetaDataService slaveMetaDataService) {
+        this.slaveMetaDataService = slaveMetaDataService;
     }
 
     @Override
@@ -69,6 +75,11 @@ public class MasterManager implements IMasterManagerService {
     @Override
     public void notifyFoundPassword(String requestId, String hash, String password) {
         masterApi.foundPassword(getMasterURI(), new FoundPasswordRequest(requestId, hash, password));
+    }
+
+    @Override
+    public void notifySlaveIsDone(SlaveCrackingRequest slaveCrackingRequest) {
+        masterApi.slaveIsDone(getMasterURI(), new SlaveDoneRequest(slaveMetaDataService.getSlaveInfo(), slaveCrackingRequest));
     }
 
     private URI getMasterURI() {

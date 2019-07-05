@@ -1,7 +1,6 @@
 package com.leon.cracker.crackerslave.externalapi;
 
-import com.leon.cracker.crackerslave.models.FoundPasswordRequest;
-import com.leon.cracker.crackerslave.models.HealthStatus;
+import com.leon.cracker.crackerslave.models.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -35,4 +34,13 @@ public class MasterApi implements IMasterApi {
 
         restTemplate.postForEntity(masterURI + "/master/found-password", foundPasswordRequest, null);
     }
+
+    @Override
+    public void slaveIsDone(URI masterURI, SlaveDoneRequest slaveDoneRequest) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        restTemplate.postForEntity(masterURI + "/master/done-processing-request", slaveDoneRequest, null);
+    }
+
+
 }

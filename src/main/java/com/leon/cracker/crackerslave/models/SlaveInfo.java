@@ -1,5 +1,6 @@
 package com.leon.cracker.crackerslave.models;
 
+import java.net.URI;
 import java.util.Objects;
 
 public class SlaveInfo  {
@@ -40,6 +41,10 @@ public class SlaveInfo  {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public URI getURI(){
+        return URI.create("http://" + this.host + ":" + this.getPort());
     }
 
     @Override

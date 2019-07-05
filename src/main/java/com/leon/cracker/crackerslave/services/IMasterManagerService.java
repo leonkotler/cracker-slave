@@ -1,5 +1,6 @@
 package com.leon.cracker.crackerslave.services;
 
+import com.leon.cracker.crackerslave.models.SlaveCrackingRequest;
 import com.leon.cracker.crackerslave.models.SlaveInfo;
 
 public interface IMasterManagerService {
@@ -15,4 +16,6 @@ public interface IMasterManagerService {
     boolean isMasterUp();
 
     void notifyFoundPassword(String requestId, String hash, String password);
+
+    void notifySlaveIsDone(SlaveCrackingRequest slaveCrackingRequest);
 }

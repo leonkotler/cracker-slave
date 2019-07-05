@@ -22,6 +22,7 @@ public class CrackingService implements ICrackingService {
         this.masterManagerService = masterManagerService;
     }
 
+
     @Override
     @Async
     public void crack(SlaveCrackingRequest slaveCrackingRequest) {
@@ -33,11 +34,13 @@ public class CrackingService implements ICrackingService {
                     String hash = MD5Hash(phoneNumber);
 
                     if (slaveCrackingRequest.getHashes().contains(hash)) {
-                        logger.info("**** Found a match! {} -> {}", phoneNumber, hash);
+                        logger.info("Found a match! {} -> {}", phoneNumber, hash);
                         masterManagerService.notifyFoundPassword(slaveCrackingRequest.getRequestId(), hash, phoneNumber);
                     }
 
                 });
+
+        masterManagerService.notifySlaveIsDone(slaveCrackingRequest);
     }
 
     private String mapPlainIntToPhoneNumber(int number) {

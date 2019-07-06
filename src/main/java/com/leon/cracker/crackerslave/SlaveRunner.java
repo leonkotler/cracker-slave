@@ -1,5 +1,6 @@
 package com.leon.cracker.crackerslave;
 
+import com.leon.cracker.crackerslave.models.RegisterWithMasterRequest;
 import com.leon.cracker.crackerslave.services.IMasterManagerService;
 import com.leon.cracker.crackerslave.services.ISlaveMetaDataService;
 import com.leon.cracker.crackerslave.models.SlaveInfo;
@@ -21,6 +22,7 @@ public class SlaveRunner implements CommandLineRunner {
 
     private IMasterManagerService masterManagerService;
     private ISlaveMetaDataService slaveMetaDataService;
+
 
     @Autowired
     public void setMasterManagerService(IMasterManagerService masterManagerService) {
@@ -50,8 +52,11 @@ public class SlaveRunner implements CommandLineRunner {
         logger.info("Slave [{}] initiated successfully by master at: {}", slaveName, hostAndPort);
 
         SlaveInfo slaveInfo = new SlaveInfo(slaveName, getLocalHost(), getPort());
-        masterManagerService.registerWithMaster(slaveInfo);
         slaveMetaDataService.setSlaveInfo(slaveInfo);
+        RegisterWithMasterRequest registerRequest = new RegisterWithMasterRequest(slaveInfo, slaveMetaDataService.getCurrentRequests());
+
+        masterManagerService.registerWithMaster(registerRequest);
+
     }
 
     private String getLocalHost() {

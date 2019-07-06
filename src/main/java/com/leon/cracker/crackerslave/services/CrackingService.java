@@ -1,5 +1,6 @@
 package com.leon.cracker.crackerslave.services;
 
+import com.leon.cracker.crackerslave.models.FoundPasswordRequest;
 import com.leon.cracker.crackerslave.models.SlaveCrackingRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -16,16 +17,24 @@ public class CrackingService implements ICrackingService {
     private static final Logger logger = LoggerFactory.getLogger(CrackingService.class);
 
     private IMasterManagerService masterManagerService;
+    private ISlaveMetaDataService slaveMetaDataService;
+
 
     @Autowired
     public void setMasterManagerService(IMasterManagerService masterManagerService) {
         this.masterManagerService = masterManagerService;
     }
 
+    @Autowired
+    public void setSlaveMetaDataService(ISlaveMetaDataService slaveMetaDataService) {
+        this.slaveMetaDataService = slaveMetaDataService;
+    }
 
     @Override
     @Async
     public void crack(SlaveCrackingRequest slaveCrackingRequest) {
+
+        slaveMetaDataService.addRequest(slaveCrackingRequest);
 
         IntStream.rangeClosed(slaveCrackingRequest.getStart(), slaveCrackingRequest.getEnd())
                 .boxed()
@@ -35,7 +44,7 @@ public class CrackingService implements ICrackingService {
 
                     if (slaveCrackingRequest.getHashes().contains(hash)) {
                         logger.info("Found a match! {} -> {}", phoneNumber, hash);
-                        masterManagerService.notifyFoundPassword(slaveCrackingRequest.getRequestId(), hash, phoneNumber);
+                        masterManagerService.notifyFoundPassword(new FoundPasswordRequest(slaveCrackingRequest.getRequestId(), hash, phoneNumber));
                     }
 
                 });
@@ -51,10 +60,6 @@ public class CrackingService implements ICrackingService {
                 .insert(3, '-')
                 .toString();
 
-    }
-
-    private String charRemoveAt(String str, int p) {
-        return str.substring(0, p) + str.substring(p + 1);
     }
 
     private String MD5Hash(String phoneNumber) {

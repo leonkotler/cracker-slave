@@ -1,6 +1,8 @@
 package com.leon.cracker.crackerslave.externalapi;
 
 import com.leon.cracker.crackerslave.models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -11,6 +13,8 @@ import java.net.URI;
 
 @Component
 public class MasterApi implements IMasterApi {
+
+    private static final Logger logger = LoggerFactory.getLogger(MasterApi.class);
 
     @Override
     public boolean isMasterUp(URI masterURI) {
@@ -32,14 +36,24 @@ public class MasterApi implements IMasterApi {
     public void foundPassword(URI masterURI, FoundPasswordRequest foundPasswordRequest) {
         RestTemplate restTemplate = new RestTemplate();
 
-        restTemplate.postForEntity(masterURI + "/master/found-password", foundPasswordRequest, null);
+        try {
+            restTemplate.postForEntity(masterURI + "/master/found-password", foundPasswordRequest, null);
+
+        } catch (ResourceAccessException exception) {
+            logger.error("FoundPassword request failed! Message is: {}", exception.getMessage());
+        }
     }
 
     @Override
     public void slaveIsDone(URI masterURI, SlaveDoneRequest slaveDoneRequest) {
         RestTemplate restTemplate = new RestTemplate();
 
-        restTemplate.postForEntity(masterURI + "/master/done-processing-request", slaveDoneRequest, null);
+        try {
+            restTemplate.postForEntity(masterURI + "/master/done-processing-request", slaveDoneRequest, null);
+
+        } catch (ResourceAccessException exception) {
+            logger.error("SlaveIsDone request failed! Message is: {}", exception.getMessage());
+        }
     }
 
 
